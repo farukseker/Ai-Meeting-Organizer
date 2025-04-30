@@ -86,7 +86,8 @@ if user_input:
     ]
     try:
         if meeting := st.session_state.prompt_manager.meeting_creator.chain.invoke({
-            "chat_messages_text": ' '.join(chat_history)
+            "chat_messages_text": ' '.join(chat_history),
+            "time_detail": get_date_for_today()
         }):
             print('giriş')
             print(meeting.__dict__)
