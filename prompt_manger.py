@@ -96,6 +96,9 @@ class PromptManager:
     def items(self):
         return self.__prompts.items()
 
+    def get(self, item) -> Prompt | None:
+        return self.__prompts.get(item, None)
+
     def __getattr__(self, item) -> Prompt | None:
         return self.__prompts.get(item, None)
 

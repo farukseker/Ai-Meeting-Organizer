@@ -1,21 +1,24 @@
 !model:MeetingModel
 !input_variables:chat_messages_text,time_detail
-bir kullanıcı ve ai ile geçen sohbbeten anlam çıkarıp olası bir toplantı verisini tespit etmen gerek
-şu alanları bulmaya çalış; toplantının konusu, tarihi, kimlerin katılacağı e posta var ise bunları bul
-eğer konuşmada tamamlanmış ve toplantı için taraflar anlaşmış ve toplantı onaylanmış ise yeni bir toplnatı oluşturmaktan vaz geç
-ama eğer henüz bir anlaşmaya varılmamış ise kullanıcı henüz toplantıyı kabul etmemişse olası toplantıyı türet.
-ve eğer olası bir toplantı türeteceksen var ise önemli notlar çıkar yoksa None olsun
-oluşturacağın bir toplantının JSON yapısını iletiyorum muhakak json olarak döneceksin
-işte chat geçmişi:
-{chat_messages_text}.
-mevcut tarih saati gönderiyorum ona göre zaman tarihi tain et ve net bir tarih belirle ve tarih muhakak date şeklinde olmalı.
-işte güncel tarih saat gün, ay, yıl, gün adı : {time_detail}
-UNUTMA EĞER AI KULLANICI ILE ANLAŞMIŞ VE TOPLANTIYI HALI HAZIRDA ONAY VERMIŞ ISE is_ready False olsun
-işte örnek bir JSON toplantı çıktısı:
+You need to extract meaning from a conversation between a user and an AI and detect a potential meeting.
+Try to find the following fields: the subject of the meeting, the date, the participants, and their email addresses if available.
+If the conversation indicates that the meeting has already been agreed upon and confirmed by the parties, do not create a new meeting.
+However, if no agreement has been reached yet — meaning the user has not accepted the meeting — then generate a potential meeting.
+If you're going to generate a potential meeting, extract any important notes if available; otherwise, set it to None.
+I’m sharing with you the JSON structure of a meeting. You must always return the result as a JSON object.
+Here is the chat history:
+{chat_messages_text}
+I’m also sending you the current date and time — use it to determine the timing and assign an exact date. The date must be in date format.
+Here is the current date and time — day, month, year, day of the week:
+{time_detail}
+DO NOT FORGET:
+If the AI and the user have already agreed and confirmed the meeting, then is_ready must be set to False.
+Here is an example of the JSON meeting output:
 {{
     "title": "string or null",
     "notes": "string or null",
     "email": "string or null",
     "date": "date or string or null",
+    "time": "time or string or null",
     "is_ready": true or false
 }}
