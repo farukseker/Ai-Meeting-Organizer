@@ -5,3 +5,8 @@ langchain-ollama
 langchain-text-splitters
 langchain_google_genai
 streamlit
+sentry_sdk
+pydantic
+email_validator
+langdetect
+requests
