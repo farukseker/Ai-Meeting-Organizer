@@ -1,3 +1,5 @@
+import time
+
 import requests
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from messages import MeetingMessage
@@ -14,8 +16,11 @@ from langdetect import detect as langdetect
 
 _config: dict = {"configurable": {"session_id": "user"}}
 
+def load_chat() -> ChatGoogleGenerativeAI:
+    return ChatGoogleGenerativeAI(model='gemini-2.0-flash', google_api_key=config.GEMINI_API_KEY)
+
 if 'llm' not in st.session_state:
-    st.session_state.llm = ChatGoogleGenerativeAI(model='gemini-2.0-flash', google_api_key=config.GEMINI_API_KEY)
+    st.session_state.llm = None
 
 if 'meeting_form_is_allowed' not in st.session_state:
     st.session_state.meeting_form_is_allowed = False
@@ -120,12 +125,14 @@ st.set_page_config(
     layout='wide'
 )
 
-
 if st.session_state.meeting_form_is_allowed and st.session_state.meeting_form:
     st.button('A Meeting ')
 
 user_input = st.chat_input()
 if user_input:
+    if st.session_state.llm is None:
+        st.session_state.llm = load_chat()
+        time.sleep(.5)
     st.session_state.chat_queue.add(HumanMessage(content=user_input))
     model_reply = st.session_state.llm.invoke(
         get_clean_history_with(SystemMessage, HumanMessage, AIMessage),
@@ -135,14 +142,15 @@ if user_input:
     try:
         history = get_clean_history_with(HumanMessage, AIMessage)
         is_user_lang_tr = langdetect(user_input) == 'tr'
-        meeting = st.session_state.prompt_manager.get(
+        prompt = st.session_state.prompt_manager.get(
                        'meeting_creator_tr' if is_user_lang_tr else 'meeting_creator'
-                    ).chain.invoke({
-                        "chat_messages_text": ' '.join(history),
-                        "time_detail": get_date_for_today()
-                    })
-        print(is_user_lang_tr)
-        print(meeting)
+                    )
+        prompt.set_llm(st.session_state.llm)
+        meeting = prompt.chain.invoke({
+            "chat_messages_text": ' '.join(history),
+            "time_detail": get_date_for_today()
+        })
+
         if meeting:
             st.session_state.meeting_form.update(**meeting.__dict__)
     except Exception as e:
